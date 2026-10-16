@@ -1,5 +1,9 @@
 # KLIJENT 2 — Hidžama Sarajevo
 
+> **Živa stranica:** https://irfan13120.github.io/KLIJENT-2-hidzama/
+> **Repozitorij:** https://github.com/irfan13120/KLIJENT-2-hidzama
+> Status: objavljeno na GitHub Pages (grana `main`, root folder)
+
 Moderna, potpuno responzivna **one-page web stranica** za centar za hidžamu u Sarajevu.
 Ručno napisan HTML + CSS + JavaScript (bez frameworka i bez vanjskih zavisnosti), s vlastitim
 fontovima i optimizovanim slikama — sve radi i offline.
