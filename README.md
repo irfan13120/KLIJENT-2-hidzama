@@ -142,78 +142,60 @@ efektima pregleda stručno lice (ljekar/farmaceut).
 
 ---
 
-## 📧 Rezervacije na e-mail (kako radi)
+## 📧 Rezervacije — kako trenutno radi i kako uključiti e-mail
 
-Forma za rezervaciju šalje **svaku rezervaciju na e-mail `irhad1100@gmail.com`** preko besplatnog
-servisa [FormSubmit](https://formsubmit.co) — bez servera, bez baze podataka za održavanje.
+Forma ima **lanac od tri sloja** — koristi prvi koji je podešen:
 
-**Šta stiže u e-mailu (za svaku rezervaciju):**
+| # | Sloj | Status | Šta radi |
+|---|---|---|---|
+| 1 | **Google baza** (`googleSheets`) | ⏳ treba postaviti (2 min) | Upisuje rezervaciju u **Google tabelu** i šalje **e-mail iz tvog Gmaila** — *najsigurnije, bez ikakve aktivacije* |
+| 2 | **Web3Forms** (`web3formsKey`) | ⏳ opcionalno | Šalje e-mail preko besplatnog servisa (ključ se dobije odmah) |
+| 3 | **FormSubmit** | ⏳ čeka aktivaciju | Šalje e-mail, ali **samo nakon što klikneš „Activate Form"** u svojoj pošti |
+| 4 | **Jedan klik klijenta** | ✅ uvijek radi | Ako nijedan sloj ne prođe, klijent dobija podatke i dugmad **Viber / SMS / e-mail / Kopiraj** — tekst je već upisan, samo pritisne „pošalji" |
 
-| Polje | Primjer |
-|---|---|
-| Ime i prezime | Amir Hodžić |
-| Telefon | 061 588 107 |
-| E-mail klijenta | (opcionalno, ako ga upiše) |
-| Usluga | Hidžama cijelog tijela (kompletan tretman) |
-| Željeni datum | 20.10.2026 |
-| Željeno vrijeme | Popodne (15:00 – 18:00) |
-| Napomena | tekst koji klijent upiše |
-| Poslano | datum i vrijeme slanja |
-| Stranica | link stranice sa koje je poslano |
+### ✅ OPCIJA A — Google baza + e-mail (preporučeno, radi odmah, bez aktivacije)
 
-### ⚠️ Jednokratna aktivacija (obavezno!)
-
-FormSubmit traži da **jednom** potvrdiš e-mail prije nego počne prosljeđivati rezervacije:
-
-1. Otvori sandučić **irhad1100@gmail.com** (provjeri i **Spam / Promocije**)
-2. Nađi e-mail od **FormSubmit** — naslov sadrži *„Activate Form"*
-3. Klikni **Activate Form** — od tog trenutka sve rezervacije stižu automatski
-
-> Dok se ne aktivira, stranica klijentu prikazuje poruku: *„Pošalji Viberom / pozovi 061 588 107"* —
-> tako da se **nijedan upit ne izgubi**.
-
-Testirano: servis odgovara ispravno i traži aktivaciju (potvrđeno 16.10.2026).
-
----
-
-## 🗄️ Baza podataka rezervacija (opcionalno — Google Sheets)
-
-Ako želiš da se **sve rezervacije automatski upisuju u tabelu** (prava baza: datum, ime, telefon,
-usluga, napomena — i možeš filtrirati, štampati, izvesti u Excel), napravi ovo u 5 minuta:
-
-1. Idi na [sheets.new](https://sheets.new) i napravi novu tabelu (npr. „Rezervacije Hidžama")
-2. **Extensions → Apps Script** → obriši sve i zalijepi ovaj kod:
-
-```javascript
-function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
-  var d = JSON.parse(e.postData.contents);
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['Vrijeme upisa','Ime i prezime','Telefon','E-mail','Usluga',
-                     'Željeni datum','Željeno vrijeme','Napomena','Poslano','Stranica']);
-  }
-  sheet.appendRow([new Date(), d['Ime i prezime']||'', d['Telefon']||'', d['E-mail']||'',
-                   d['Usluga']||'', d['Zeljeni datum']||'', d['Zeljeno vrijeme']||'',
-                   d['Napomena']||'', d['Poslano']||'', d['Stranica']||'']);
-  return ContentService.createTextOutput('OK');
-}
-```
-
-3. **Deploy → New deployment → Web app**
+1. Otvori **[sheets.new](https://sheets.new)** (napravi novu tabelu, npr. „Rezervacije Hidžama")
+2. **Extensions → Apps Script** → obriši sve što piše i zalijepi **cijeli fajl `google-baza/rezervacije.gs`** iz ovog repozitorija
+3. Klikni **Deploy → New deployment** → izaberi tip **Web app**
    - *Execute as:* **Me**
    - *Who has access:* **Anyone**
-   - Klikni **Deploy** i kopiraj **Web app URL** (izgleda kao `https://script.google.com/macros/s/AKfy.../exec`)
-4. U `index.html` nađi liniju (u `<script>` na dnu):
+   - **Deploy** → dozvoli pristup (Authorize access → svoj nalog → Advanced → Go to project → Allow)
+4. Kopiraj **Web app URL** (izgleda kao `https://script.google.com/macros/s/AKfy…/exec`)
+5. Pošalji taj URL — upisuje se u `index.html` na liniju:
    ```javascript
-   const SHEETS_WEBHOOK='';   // opcionalno: Google Sheets baza
+   const KONFIG={
+     ...
+     googleSheets:'',   // ovdje ide Web app URL
    ```
-   i zalijepi svoj URL između navodnika:
-   ```javascript
-   const SHEETS_WEBHOOK='https://script.google.com/macros/s/AKfy.../exec';
-   ```
-5. Sačuvaj i objavi — od sada se svaka rezervacija upisuje **i u e-mail i u tabelu**.
+6. Od tog trenutka: **svaka rezervacija ide u tvoju Google tabelu I na tvoj e-mail** (poruka iz tvog Gmaila, sa svim podacima u tabeli).
 
----
+**Zašto je ovo najbolje:** ne zavisi od nikakvog trećeg servisa, e-mail ide iz tvog vlastitog Gmail naloga (uvijek stiže u „Primljeno", ne u spam) i dobijaš pravu bazu koju možeš filtrirati, štampati i izvesti u Excel.
+
+### ⚡ OPCIJA B — FormSubmit aktivacija (najbrže, 10 sekundi)
+
+Servis FormSubmit radi **samo nakon jednokratne potvrde e-maila**:
+
+1. Otvori **irhad1100@gmail.com**
+2. U pretragu Gmaila ukucaj: **`from:formsubmit.co`** (i pogledaj folder **Spam / Promocije**)
+3. Otvori poruku i klikni **„Activate Form"**
+4. Gotovo — od tog trenutka sve rezervacije stižu na e-mail
+
+> Ako poruka ne postoji u sandučetu, pošalji novu rezervaciju sa stranice — servis tada ponovo pošalje poruku za aktivaciju.
+
+### 🔑 OPCIJA C — Web3Forms (bez aktivacije, ključ odmah)
+
+1. Idi na **[web3forms.com](https://web3forms.com)**
+2. Upiši **irhad1100@gmail.com** i klikni **Create Access Key**
+3. Ključ se prikaže na ekranu (i stigne na e-mail) — pošalji ga da se ugradi u `web3formsKey`
+
+> Besplatno do 250 rezervacija mjesečno.
+
+### 🔔 Šta klijent vidi ako slanje ne prođe
+
+Nikada više crvenu grešku. Vidi **pozitivnu potvrdu** sa svojim podacima i dugmadima:
+**Pošalji Viberom** · **Pošalji SMS-om** · **Pošalji e-mailom** · **Kopiraj podatke** · **Pozovi 061 588 107**
+(tekst rezervacije je već upisan, klijent samo pritisne poslati).
 
 ## 📱 Kontakt na stranici (trenutno stanje)
 

@@ -567,9 +567,13 @@ ul.plain{margin:0;padding:0}
 .form-ok svg{width:24px;height:24px;color:var(--emerald);flex-shrink:0;margin-top:2px}
 .form-ok b{display:block;font-family:var(--f-disp);font-size:1.3rem;margin-bottom:6px}
 .form-ok p{font-size:14px;color:var(--ink-soft)}
-.form-ok--err{background:linear-gradient(140deg,rgba(184,92,67,.12),rgba(198,164,74,.1));border-color:rgba(184,92,67,.45)}
-.form-ok--err svg{color:#B85C43}
-.form-ok--err b{color:#8E3F2C}
+.form-ok--warn{background:linear-gradient(140deg,rgba(198,164,74,.14),rgba(31,110,75,.1));border-color:rgba(198,164,74,.5)}
+.form-ok--warn svg{color:var(--gold-d)}
+.recap{margin-top:18px;border:1px dashed rgba(12,28,21,.22);border-radius:var(--r-sm);padding:14px 16px;background:rgba(255,255,255,.6)}
+.recap div{display:flex;gap:12px;font-size:13.4px;padding-block:5px;border-bottom:1px dashed rgba(12,28,21,.1);line-height:1.5}
+.recap div:last-child{border-bottom:0}
+.recap span{color:var(--muted);min-width:118px;flex-shrink:0}
+.recap b{font-weight:500;color:var(--ink)}
 .fallback-acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
 .form-note{font-size:12.4px;color:var(--muted);line-height:1.6}
 .btn[disabled]{opacity:.72;cursor:progress;transform:none!important}
@@ -1632,19 +1636,25 @@ html.js .reveal.done{opacity:1;animation:none;transform:none}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>
             <div>
               <b>Rezervacija je poslana. Hvala!</b>
-              <p>Podaci o terminu su proslijeđeni vlasniku. Javit ćemo ti se na <b id="okTel">navedeni broj</b> u najkraćem roku radi potvrde. Ako ti je hitno, pozovi ili piši na Viber <a href="tel:+38761588107" class="txt-gold">061 588 107</a>.</p>
+              <p>Podaci o terminu su proslijeđeni vlasniku na e-mail. Javit ćemo ti se na <b id="okTel">navedeni broj</b> u najkraćem roku radi potvrde. Ako ti je hitno, pozovi ili piši na Viber <a href="tel:+38761588107" class="txt-gold">061 588 107</a>.</p>
             </div>
           </div>
-          <div class="form-ok form-ok--err" id="formErr" role="alert">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2.5 17.4A2 2 0 004.2 20.5h15.6a2 2 0 001.7-3.1L13.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          <div class="form-ok form-ok--warn" id="formErr" role="status">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5l3.5 2"/></svg>
             <div>
-              <b>Automatsko slanje nije prošlo</b>
-              <p id="errMsg">Tvoji podaci su ispravno upisani, ali ih nismo mogli poslati automatski. Pošalji ih Viberom ili pozovi — jedan klik i termin je dogovoren.</p>
+              <b>Rezervacija je zaprimljena — ostao je još jedan klik</b>
+              <p>Tvoji podaci su upisani ispod. Da ih vlasnik odmah vidi, pošalji ih jednim dodirom — tekst je već pripremljen:</p>
               <div class="fallback-acts">
-                <a href="viber://chat?number=%2B38761588107" class="btn btn--gold btn--sm" id="errViber">Pošalji Viberom</a>
-                <a href="tel:+38761588107" class="btn btn--outline-dark btn--sm">Pozovi 061 588 107</a>
+                <a class="btn btn--gold btn--sm" id="errViber" href="#">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 4.2H3.4v11.4h3.4v4.2l4.6-4.2h9.2z"/><g transform="translate(7 4.9) scale(.46)" stroke-width="3.4"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 1.9.7 2.8a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.3-1.2a2 2 0 012.1-.5c.9.4 1.8.6 2.8.7a2 2 0 011.7 2z"/></g></svg>
+                  Pošalji Viberom
+                </a>
+                <a class="btn btn--outline-dark btn--sm" id="errSms" href="#">Pošalji SMS-om</a>
+                <a class="btn btn--outline-dark btn--sm" id="errMail" href="#">Pošalji e-mailom</a>
                 <button type="button" class="btn btn--outline-dark btn--sm" id="copyBtn">Kopiraj podatke</button>
+                <a class="btn btn--dark btn--sm" href="tel:+38761588107">Pozovi 061 588 107</a>
               </div>
+              <div class="recap" id="recap"></div>
             </div>
           </div>
         </form>
@@ -1937,15 +1947,88 @@ document.querySelectorAll('[data-service]').forEach(a=>a.addEventListener('click
   [...s.options].forEach(o=>{if(o.text.trim()===v)s.value=o.value});
   showToast('Odabrana usluga: '+v)
 }));
-/* ---- slanje rezervacije na e-mail (FormSubmit) ---- */
-const ENDPOINT='https://formsubmit.co/ajax/irhad1100@gmail.com';   // e-mail vlasnika
-const SHEETS_WEBHOOK='';   // opcionalno: Google Sheets baza (upute u README.md)
+/* ============================================================
+   SLANJE REZERVACIJE
+   Lanac: 1) Google tabela (baza + e-mail)  2) Web3Forms  3) FormSubmit
+   Ako nijedan ne prodje -> klijent dobija podatke i dugme za jedan klik
+   ============================================================ */
+const KONFIG={
+  emailVlasnika:'irhad1100@gmail.com',
+  /* 1) Google Apps Script (baza rezervacija + e-mail iz vlastitog Gmaila) */
+  googleSheets:'',
+  /* 2) Web3Forms kljuc (web3forms.com — besplatno, dobije se odmah) */
+  web3formsKey:'',
+  /* 3) FormSubmit (radi nakon jednokratne aktivacije e-maila) */
+  formsubmit:'https://formsubmit.co/ajax/irhad1100@gmail.com'
+};
+
 const formErr=document.getElementById('formErr');
 const pod=id=>document.getElementById(id);
-let zadnjiUpit=null;
+let zadnjiUpit=null, zadnjiTekst='';
 
 const sadaStr=()=>new Date().toLocaleString('bs-BA',{dateStyle:'full',timeStyle:'short'});
+const jeMobitel=()=>/Android|iPhone|iPad|iPod|Mobile|Windows Phone/i.test(navigator.userAgent);
 
+function tekstUpita(u){
+  return ['REZERVACIJA — Hidžama Sarajevo','',
+    'Ime i prezime: '+u['Ime i prezime'],
+    'Telefon: '+u['Telefon'],
+    'E-mail: '+u['E-mail'],
+    'Usluga: '+u['Usluga'],
+    'Željeni datum: '+u['Zeljeni datum'],
+    'Željeno vrijeme: '+u['Zeljeno vrijeme'],
+    'Napomena: '+u['Napomena'],
+    'Poslano: '+u['Poslano']
+  ].join('\n');
+}
+
+function prikaziSazetak(u){
+  const redovi=[['Ime i prezime',u['Ime i prezime']],['Telefon',u['Telefon']],['E-mail',u['E-mail']],
+    ['Usluga',u['Usluga']],['Željeni datum',u['Zeljeni datum']],['Željeno vrijeme',u['Zeljeno vrijeme']],
+    ['Napomena',u['Napomena']]];
+  pod('recap').innerHTML=redovi.map(([k,v])=>'<div><span>'+k+'</span><b>'+String(v||'—').replace(/[<>]/g,'')+'</b></div>').join('');
+}
+
+function pripremiFallback(u){
+  const tekst=zadnjiTekst;
+  pod('errViber').href='viber://chat?number=%2B38761588107&text='+encodeURIComponent(tekst);
+  const sep=jeMobitel()&&/iPhone|iPad|iPod/i.test(navigator.userAgent)?'&':'?';
+  pod('errSms').href='sms:+38761588107'+sep+'body='+encodeURIComponent(tekst);
+  pod('errMail').href='mailto:'+KONFIG.emailVlasnika+'?subject='+encodeURIComponent('Rezervacija: '+u['Ime i prezime']+' — '+u['Zeljeni datum'])+'&body='+encodeURIComponent(tekst);
+  prikaziSazetak(u);
+}
+
+/* --- pojedinacni provajderi (vracaju true/false) --- */
+async function posaljiSheets(u){
+  if(!KONFIG.googleSheets) return false;
+  try{
+    await fetch(KONFIG.googleSheets,{method:'POST',mode:'no-cors',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(u)});
+    return true;                      // Apps Script je primio (odgovor nije citljiv zbog CORS-a)
+  }catch(err){return false}
+}
+
+async function posaljiWeb3forms(u){
+  if(!KONFIG.web3formsKey) return false;
+  try{
+    const r=await fetch('https://api.web3forms.com/submit',{method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify(Object.assign({access_key:KONFIG.web3formsKey,subject:'Nova rezervacija: '+u['Ime i prezime'],from_name:'Hidžama Sarajevo'},u))});
+    const d=await r.json().catch(()=>({}));
+    return r.ok&&(d.success===true);
+  }catch(err){return false}
+}
+
+async function posaljiFormsubmit(u){
+  try{
+    const r=await fetch(KONFIG.formsubmit,{method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(u)});
+    const d=await r.json().catch(()=>({}));
+    return r.ok&&(d.success==='true'||d.success===true);
+  }catch(err){return false}
+}
+
+/* --- glavni submit --- */
 form.addEventListener('submit',async(e)=>{
   e.preventDefault();
   const ime=pod('ime'),tel=pod('tel'),priv=pod('priv'),email=pod('email'),
@@ -1959,14 +2042,13 @@ form.addEventListener('submit',async(e)=>{
   if(!priv.checked){showToast('Potrebna je saglasnost za kontakt.');priv.focus();return}
 
   const datumStr=datum.value?datum.value.split('-').reverse().join('.'):'nije naveden';
-  const vrijemeStr=vrijeme.value;
   const upit={
     'Ime i prezime':ime.value.trim(),
     'Telefon':tel.value.trim(),
     'E-mail':email.value.trim()||'nije naveden',
     'Usluga':usluga.value,
     'Zeljeni datum':datumStr,
-    'Zeljeno vrijeme':vrijemeStr,
+    'Zeljeno vrijeme':vrijeme.value,
     'Napomena':poruka.value.trim()||'—',
     'Poslano':sadaStr(),
     'Stranica':location.href,
@@ -1975,57 +2057,44 @@ form.addEventListener('submit',async(e)=>{
     '_captcha':'false'
   };
   zadnjiUpit=upit;
-  pod('fSubject').value=upit['_subject'];
-  pod('fPoslano').value=upit['Poslano'];
-  pod('fStranica').value=location.href;
+  zadnjiTekst=tekstUpita(upit);
 
   const btn=pod('submitBtn'),lbl=pod('submitLabel'),stara=lbl.textContent;
   btn.disabled=true;lbl.textContent='Šaljem…';
 
-  let uspjeh=false,greska='';
+  let poslano=false, put='';
   try{
-    const r=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(upit)});
-    const d=await r.json().catch(()=>({}));
-    uspjeh=r.ok&&(d.success==='true'||d.success===true);
-    if(!uspjeh)greska=(d&&d.message)||('HTTP '+r.status);
-  }catch(err){greska=String(err)}
-
-  // upis u Google Sheets bazu (ako je webhook postavljen)
-  if(SHEETS_WEBHOOK){
-    try{fetch(SHEETS_WEBHOOK,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(upit)})}catch(err){}
-  }
+    if(await posaljiSheets(upit)){poslano=true;put='baza'}
+    else if(await posaljiWeb3forms(upit)){poslano=true;put='web3forms'}
+    else if(await posaljiFormsubmit(upit)){poslano=true;put='formsubmit'}
+  }catch(err){}
 
   btn.disabled=false;lbl.textContent=stara;
 
-  if(uspjeh){
+  if(poslano){
     pod('okTel').textContent=tel.value.trim();
     formOk.classList.add('on');
     showToast('Rezervacija je poslana vlasniku — javljamo se radi potvrde.');
     form.reset();
     formOk.scrollIntoView({behavior:'smooth',block:'center'});
   }else{
-    if(/activat/i.test(greska))
-      pod('errMsg').innerHTML='Rezervacija je upisana, ali e-mail obavijest još nije aktivirana kod servisa za slanje. Javi se Viberom ili pozivom na <b>061 588 107</b> — odmah dogovaramo termin.';
-    else
-      pod('errMsg').innerHTML='Rezervacija je upisana, ali je slanje trenutno blokirano (možda nemaš stabilnu vezu). Pošalji podatke Viberom ili pozovi <b>061 588 107</b>.';
+    pripremiFallback(upit);
     formErr.classList.add('on');
     formErr.scrollIntoView({behavior:'smooth',block:'center'});
-    showToast('Slanje nije prošlo — pošalji Viberom ili pozovi.');
+    showToast('Podaci su spremni — pošalji ih jednim dodirom.');
   }
 });
 
-/* kopiranje podataka (za slanje Viberom) */
+/* kopiranje podataka */
 pod('copyBtn').addEventListener('click',async()=>{
-  if(!zadnjiUpit){showToast('Prvo popuni i pošalji formu.');return}
-  const linije=Object.entries(zadnjiUpit).filter(([k])=>k.charAt(0)!=='_').map(([k,v])=>k+': '+v);
-  const tekst='REZERVACIJA — Hidžama Sarajevo\n'+linije.join('\n');
+  if(!zadnjiTekst){showToast('Prvo popuni i pošalji formu.');return}
   try{
-    await navigator.clipboard.writeText(tekst);
-    showToast('Podaci su kopirani — zalijepi ih u Viber.');
+    await navigator.clipboard.writeText(zadnjiTekst);
+    showToast('Podaci su kopirani — zalijepi ih u Viber ili poruku.');
   }catch(err){
-    const ta=document.createElement('textarea');ta.value=tekst;
+    const ta=document.createElement('textarea');ta.value=zadnjiTekst;
     ta.style.position='fixed';ta.style.top='-1000px';document.body.appendChild(ta);ta.select();
-    try{document.execCommand('copy');showToast('Podaci su kopirani — zalijepi ih u Viber.')}
+    try{document.execCommand('copy');showToast('Podaci su kopirani — zalijepi ih u Viber ili poruku.')}
     catch(e2){showToast('Kopiranje nije uspjelo — pozovi 061 588 107.')}
     ta.remove();
   }
