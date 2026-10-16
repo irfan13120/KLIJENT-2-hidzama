@@ -1,6 +1,7 @@
 # KLIJENT 2 — Hidžama Sarajevo
 
-> **Živa stranica:** https://irfan13120.github.io/KLIJENT-2-hidzama/
+> **🌐 Živa stranica (javna, dostupna svima):** https://irfan13120.github.io/KLIJENT-2-hidzama/
+> **🔗 Kratki link za dijeljenje:** https://tinyurl.com/hidzama-sarajevo
 > **Repozitorij:** https://github.com/irfan13120/KLIJENT-2-hidzama
 > Status: objavljeno na GitHub Pages (grana `main`, root folder)
 
