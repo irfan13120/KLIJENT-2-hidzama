@@ -149,7 +149,7 @@ Forma ne zavisi od jednog servisa. Pokreće provajdere **redom** i koristi prvi 
 | # | Provajder | Postavka u kodu | Status |
 |---|---|---|---|
 | 1 | **Google tabela + e-mail iz tvog Gmaila** | `KONFIG.googleSheets` | ⏳ opcionalno (daje i bazu podataka) |
-| 2 | **Formly.email** | `KONFIG.formlyKey` | ⏳ čeka ključ iz e-maila |
+| 2 | **Formly.email** | `KONFIG.formlyKey` | ✅ **AKTIVNO** — rezervacije stižu na irhad1100@gmail.com |
 | 3 | **Web3Forms** | `KONFIG.web3formsKey` | ⏳ čeka ključ (web3forms.com) |
 | 4 | **FormSubmit** | `KONFIG.formsubmit` | ⏳ čeka jednokratnu aktivaciju e-maila |
 | 5 | **Jedan klik klijenta** | automatski | ✅ **uvijek radi** — Viber / SMS / e-mail / kopiraj |
@@ -157,14 +157,17 @@ Forma ne zavisi od jednog servisa. Pokreće provajdere **redom** i koristi prvi 
 > Ako nijedan servis ne prođe, klijent **nikada ne vidi grešku**: dobije svoje podatke ispisane i
 > dugmad **Pošalji Viberom · Pošalji SMS-om · Pošalji e-mailom · Kopiraj · Pozovi 061 588 107**.
 
-### 🔑 Formly.email — najlakši put (bez aktivacionih linkova)
+### ✅ Formly.email — AKTIVNO (radi odmah)
 
-1. Otvori **https://formly.email**
-2. Upiši `irhad1100@gmail.com` → **Get your access key**
-3. Ključ stiže na e-mail — kopiraj ga
-4. Pošalji ključ da se upiše u `KONFIG.formlyKey`
+Ključ je ugrađen u `index.html` (`KONFIG.formlyKey`) i **testiran**: servis vraća
+`{"success":true,"message":"Email sent successfully!"}`, a rezervacija stiže na **irhad1100@gmail.com**.
 
-Besplatno: 50 rezervacija mjesečno.
+- Besplatno: **50 rezervacija mjesečno**
+- Ako se limit prekorači, forma automatski prelazi na sljedeći sloj, a ako ni oni ne prođu —
+  klijent dobija dugmad Viber / SMS / e-mail (ništa se ne gubi)
+
+**Održavanje:** u `KONFIG` (dno `index.html`) ključ stoji kao
+`formlyKey:'8ea3ac3201e949bfac68f3c27cd8a913',` — kad se promijeni, zamijeni samo taj niz.
 
 ### 🔑 Web3Forms — alternativa
 

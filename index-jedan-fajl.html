@@ -1956,8 +1956,8 @@ const KONFIG={
   emailVlasnika:'irhad1100@gmail.com',
   /* 1) Google Apps Script (baza rezervacija + e-mail iz vlastitog Gmaila) */
   googleSheets:'',
-  /* 2) Formly.email kljuc (formly.email — stize e-mailom, bez aktivacije) */
-  formlyKey:'',
+  /* 2) Formly.email kljuc — AKTIVAN: rezervacije stizu na irhad1100@gmail.com */
+  formlyKey:'8ea3ac3201e949bfac68f3c27cd8a913',
   /* 3) Web3Forms kljuc (web3forms.com — besplatno, dobije se odmah) */
   web3formsKey:'',
   /* 3) FormSubmit (radi nakon jednokratne aktivacije e-maila) */
@@ -2015,6 +2015,7 @@ async function posaljiFormly(u){
   try{
     const fd=new FormData();
     fd.append('access_key',KONFIG.formlyKey);
+    fd.append('__ajax__','true');
     fd.append('name',u['Ime i prezime']);
     fd.append('email',(u['E-mail']&&u['E-mail']!=='nije naveden')?u['E-mail']:KONFIG.emailVlasnika);
     fd.append('message',zadnjiTekst);
