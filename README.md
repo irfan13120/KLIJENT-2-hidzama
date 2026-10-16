@@ -142,60 +142,46 @@ efektima pregleda stručno lice (ljekar/farmaceut).
 
 ---
 
-## 📧 Rezervacije — kako trenutno radi i kako uključiti e-mail
+## 📧 Rezervacije na e-mail — lanac slanja (kako radi)
 
-Forma ima **lanac od tri sloja** — koristi prvi koji je podešen:
+Forma ne zavisi od jednog servisa. Pokreće provajdere **redom** i koristi prvi koji uspije:
 
-| # | Sloj | Status | Šta radi |
+| # | Provajder | Postavka u kodu | Status |
 |---|---|---|---|
-| 1 | **Google baza** (`googleSheets`) | ⏳ treba postaviti (2 min) | Upisuje rezervaciju u **Google tabelu** i šalje **e-mail iz tvog Gmaila** — *najsigurnije, bez ikakve aktivacije* |
-| 2 | **Web3Forms** (`web3formsKey`) | ⏳ opcionalno | Šalje e-mail preko besplatnog servisa (ključ se dobije odmah) |
-| 3 | **FormSubmit** | ⏳ čeka aktivaciju | Šalje e-mail, ali **samo nakon što klikneš „Activate Form"** u svojoj pošti |
-| 4 | **Jedan klik klijenta** | ✅ uvijek radi | Ako nijedan sloj ne prođe, klijent dobija podatke i dugmad **Viber / SMS / e-mail / Kopiraj** — tekst je već upisan, samo pritisne „pošalji" |
+| 1 | **Google tabela + e-mail iz tvog Gmaila** | `KONFIG.googleSheets` | ⏳ opcionalno (daje i bazu podataka) |
+| 2 | **Formly.email** | `KONFIG.formlyKey` | ⏳ čeka ključ iz e-maila |
+| 3 | **Web3Forms** | `KONFIG.web3formsKey` | ⏳ čeka ključ (web3forms.com) |
+| 4 | **FormSubmit** | `KONFIG.formsubmit` | ⏳ čeka jednokratnu aktivaciju e-maila |
+| 5 | **Jedan klik klijenta** | automatski | ✅ **uvijek radi** — Viber / SMS / e-mail / kopiraj |
 
-### ✅ OPCIJA A — Google baza + e-mail (preporučeno, radi odmah, bez aktivacije)
+> Ako nijedan servis ne prođe, klijent **nikada ne vidi grešku**: dobije svoje podatke ispisane i
+> dugmad **Pošalji Viberom · Pošalji SMS-om · Pošalji e-mailom · Kopiraj · Pozovi 061 588 107**.
 
-1. Otvori **[sheets.new](https://sheets.new)** (napravi novu tabelu, npr. „Rezervacije Hidžama")
-2. **Extensions → Apps Script** → obriši sve što piše i zalijepi **cijeli fajl `google-baza/rezervacije.gs`** iz ovog repozitorija
-3. Klikni **Deploy → New deployment** → izaberi tip **Web app**
-   - *Execute as:* **Me**
-   - *Who has access:* **Anyone**
-   - **Deploy** → dozvoli pristup (Authorize access → svoj nalog → Advanced → Go to project → Allow)
-4. Kopiraj **Web app URL** (izgleda kao `https://script.google.com/macros/s/AKfy…/exec`)
-5. Pošalji taj URL — upisuje se u `index.html` na liniju:
-   ```javascript
-   const KONFIG={
-     ...
-     googleSheets:'',   // ovdje ide Web app URL
-   ```
-6. Od tog trenutka: **svaka rezervacija ide u tvoju Google tabelu I na tvoj e-mail** (poruka iz tvog Gmaila, sa svim podacima u tabeli).
+### 🔑 Formly.email — najlakši put (bez aktivacionih linkova)
 
-**Zašto je ovo najbolje:** ne zavisi od nikakvog trećeg servisa, e-mail ide iz tvog vlastitog Gmail naloga (uvijek stiže u „Primljeno", ne u spam) i dobijaš pravu bazu koju možeš filtrirati, štampati i izvesti u Excel.
+1. Otvori **https://formly.email**
+2. Upiši `irhad1100@gmail.com` → **Get your access key**
+3. Ključ stiže na e-mail — kopiraj ga
+4. Pošalji ključ da se upiše u `KONFIG.formlyKey`
 
-### ⚡ OPCIJA B — FormSubmit aktivacija (najbrže, 10 sekundi)
+Besplatno: 50 rezervacija mjesečno.
 
-Servis FormSubmit radi **samo nakon jednokratne potvrde e-maila**:
+### 🔑 Web3Forms — alternativa
 
-1. Otvori **irhad1100@gmail.com**
-2. U pretragu Gmaila ukucaj: **`from:formsubmit.co`** (i pogledaj folder **Spam / Promocije**)
-3. Otvori poruku i klikni **„Activate Form"**
-4. Gotovo — od tog trenutka sve rezervacije stižu na e-mail
+1. **https://web3forms.com** → upiši `irhad1100@gmail.com` → **Create Access Key**
+2. Ključ se prikaže na ekranu → pošalji ga za ugradnju u `KONFIG.web3formsKey`
 
-> Ako poruka ne postoji u sandučetu, pošalji novu rezervaciju sa stranice — servis tada ponovo pošalje poruku za aktivaciju.
+Besplatno: 250 rezervacija mjesečno.
 
-### 🔑 OPCIJA C — Web3Forms (bez aktivacije, ključ odmah)
+### ⚡ FormSubmit — jednokratna aktivacija
 
-1. Idi na **[web3forms.com](https://web3forms.com)**
-2. Upiši **irhad1100@gmail.com** i klikni **Create Access Key**
-3. Ključ se prikaže na ekranu (i stigne na e-mail) — pošalji ga da se ugradi u `web3formsKey`
+1. U Gmailu pretraži **`from:formsubmit.co`**
+2. Otvori **najnoviju** poruku i klikni **„Activate Form"** (stariji linkovi ističu!)
 
-> Besplatno do 250 rezervacija mjesečno.
+### 🗄️ Google tabela kao baza podataka (opcionalno)
 
-### 🔔 Šta klijent vidi ako slanje ne prođe
-
-Nikada više crvenu grešku. Vidi **pozitivnu potvrdu** sa svojim podacima i dugmadima:
-**Pošalji Viberom** · **Pošalji SMS-om** · **Pošalji e-mailom** · **Kopiraj podatke** · **Pozovi 061 588 107**
-(tekst rezervacije je već upisan, klijent samo pritisne poslati).
+Vidi `google-baza/rezervacije.gs` — Apps Script koji upisuje svaku rezervaciju u Google tabelu i
+šalje e-mail iz tvog Gmaila. Uputa za postavljanje je u komentarima fajla i u sekciji niže.
 
 ## 📱 Kontakt na stranici (trenutno stanje)
 

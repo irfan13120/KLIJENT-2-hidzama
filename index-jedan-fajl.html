@@ -1956,7 +1956,9 @@ const KONFIG={
   emailVlasnika:'irhad1100@gmail.com',
   /* 1) Google Apps Script (baza rezervacija + e-mail iz vlastitog Gmaila) */
   googleSheets:'',
-  /* 2) Web3Forms kljuc (web3forms.com — besplatno, dobije se odmah) */
+  /* 2) Formly.email kljuc (formly.email — stize e-mailom, bez aktivacije) */
+  formlyKey:'',
+  /* 3) Web3Forms kljuc (web3forms.com — besplatno, dobije se odmah) */
   web3formsKey:'',
   /* 3) FormSubmit (radi nakon jednokratne aktivacije e-maila) */
   formsubmit:'https://formsubmit.co/ajax/irhad1100@gmail.com'
@@ -2005,6 +2007,23 @@ async function posaljiSheets(u){
     await fetch(KONFIG.googleSheets,{method:'POST',mode:'no-cors',
       headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(u)});
     return true;                      // Apps Script je primio (odgovor nije citljiv zbog CORS-a)
+  }catch(err){return false}
+}
+
+async function posaljiFormly(u){
+  if(!KONFIG.formlyKey) return false;
+  try{
+    const tijelo=Object.assign({
+      access_key:KONFIG.formlyKey,
+      __ajax__:'true',
+      subject:u['_subject'],
+      reply_to:(u['E-mail']&&u['E-mail']!=='nije naveden')?u['E-mail']:''
+    },u);
+    const r=await fetch('https://formly.email/submit',{method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify(tijelo)});
+    const d=await r.json().catch(()=>({}));
+    return r.ok&&(d.success===true);
   }catch(err){return false}
 }
 
@@ -2065,6 +2084,7 @@ form.addEventListener('submit',async(e)=>{
   let poslano=false, put='';
   try{
     if(await posaljiSheets(upit)){poslano=true;put='baza'}
+    else if(await posaljiFormly(upit)){poslano=true;put='formly'}
     else if(await posaljiWeb3forms(upit)){poslano=true;put='web3forms'}
     else if(await posaljiFormsubmit(upit)){poslano=true;put='formsubmit'}
   }catch(err){}
