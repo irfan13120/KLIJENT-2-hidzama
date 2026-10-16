@@ -2013,17 +2013,20 @@ async function posaljiSheets(u){
 async function posaljiFormly(u){
   if(!KONFIG.formlyKey) return false;
   try{
-    const tijelo=Object.assign({
-      access_key:KONFIG.formlyKey,
-      __ajax__:'true',
-      subject:u['_subject'],
-      reply_to:(u['E-mail']&&u['E-mail']!=='nije naveden')?u['E-mail']:''
-    },u);
-    const r=await fetch('https://formly.email/submit',{method:'POST',
-      headers:{'Content-Type':'application/json','Accept':'application/json'},
-      body:JSON.stringify(tijelo)});
+    const fd=new FormData();
+    fd.append('access_key',KONFIG.formlyKey);
+    fd.append('name',u['Ime i prezime']);
+    fd.append('email',(u['E-mail']&&u['E-mail']!=='nije naveden')?u['E-mail']:KONFIG.emailVlasnika);
+    fd.append('message',zadnjiTekst);
+    fd.append('subject',u['_subject']);
+    fd.append('sazetak',u['_subject']);
+    Object.keys(u).forEach(function(k){
+      if(k.charAt(0)!=='_') fd.append(k,u[k]);
+    });
+    const r=await fetch('https://formly.email/submit',{method:'POST',body:fd,
+      headers:{'Accept':'application/json'}});
     const d=await r.json().catch(()=>({}));
-    return r.ok&&(d.success===true);
+    return r.ok&&(d.success===true||d.success==='true');
   }catch(err){return false}
 }
 
