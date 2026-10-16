@@ -87,9 +87,9 @@ Svi podaci ispod su **privremeni (demo)** — zamijeni ih stvarnim:
 
 | Podatak | Trenutno (demo) | Gdje se nalazi |
 |---|---|---|
-| Telefon | `+387 61 234 567` | `index.html` → pretraga `61234567` i `61 234 567` (13 mjesta) |
+| ✅ Telefon / Viber | `061 588 107` — **ispravljeno** (poziv + Viber) | `index.html` → pretraga `61588107` (10 tel: linkova, 7 Viber linkova) |
 | Adresa | `Ferhadija 12, 71000 Sarajevo` | `index.html` (nav, hero, kontakt, footer) |
-| E-mail | `info@hidzama-sarajevo.ba` | `index.html` (kontakt, footer) |
+| ✅ E-mail | uklonjen sa stranice — kontakt ide samo pozivom i Viberom | — |
 | Radno vrijeme | Pon–Pet 09–20, Sub 10–17 | hero kartica, kontakt, footer |
 | Cijene | 40 / 55 / 60 / 160 KM | sekcija „Usluge & cijene“ + footer |
 | Instagram / Facebook | `https://instagram.com`, `https://facebook.com` | footer (`socials`) |
@@ -139,3 +139,84 @@ Za pregled bez servera samo otvori `index-jedan-fajl.html` dvoklikom.
 Sadržaj stranice je informativnog karaktera. Hidžama je komplementarna metoda i ne zamjenjuje
 medicinsku dijagnostiku i terapiju. Prije objave preporučuje se da tekstove o zdravstvenim
 efektima pregleda stručno lice (ljekar/farmaceut).
+
+---
+
+## 📧 Rezervacije na e-mail (kako radi)
+
+Forma za rezervaciju šalje **svaku rezervaciju na e-mail `irhad1100@gmail.com`** preko besplatnog
+servisa [FormSubmit](https://formsubmit.co) — bez servera, bez baze podataka za održavanje.
+
+**Šta stiže u e-mailu (za svaku rezervaciju):**
+
+| Polje | Primjer |
+|---|---|
+| Ime i prezime | Amir Hodžić |
+| Telefon | 061 588 107 |
+| E-mail klijenta | (opcionalno, ako ga upiše) |
+| Usluga | Hidžama cijelog tijela (kompletan tretman) |
+| Željeni datum | 20.10.2026 |
+| Željeno vrijeme | Popodne (15:00 – 18:00) |
+| Napomena | tekst koji klijent upiše |
+| Poslano | datum i vrijeme slanja |
+| Stranica | link stranice sa koje je poslano |
+
+### ⚠️ Jednokratna aktivacija (obavezno!)
+
+FormSubmit traži da **jednom** potvrdiš e-mail prije nego počne prosljeđivati rezervacije:
+
+1. Otvori sandučić **irhad1100@gmail.com** (provjeri i **Spam / Promocije**)
+2. Nađi e-mail od **FormSubmit** — naslov sadrži *„Activate Form"*
+3. Klikni **Activate Form** — od tog trenutka sve rezervacije stižu automatski
+
+> Dok se ne aktivira, stranica klijentu prikazuje poruku: *„Pošalji Viberom / pozovi 061 588 107"* —
+> tako da se **nijedan upit ne izgubi**.
+
+Testirano: servis odgovara ispravno i traži aktivaciju (potvrđeno 16.10.2026).
+
+---
+
+## 🗄️ Baza podataka rezervacija (opcionalno — Google Sheets)
+
+Ako želiš da se **sve rezervacije automatski upisuju u tabelu** (prava baza: datum, ime, telefon,
+usluga, napomena — i možeš filtrirati, štampati, izvesti u Excel), napravi ovo u 5 minuta:
+
+1. Idi na [sheets.new](https://sheets.new) i napravi novu tabelu (npr. „Rezervacije Hidžama")
+2. **Extensions → Apps Script** → obriši sve i zalijepi ovaj kod:
+
+```javascript
+function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+  var d = JSON.parse(e.postData.contents);
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(['Vrijeme upisa','Ime i prezime','Telefon','E-mail','Usluga',
+                     'Željeni datum','Željeno vrijeme','Napomena','Poslano','Stranica']);
+  }
+  sheet.appendRow([new Date(), d['Ime i prezime']||'', d['Telefon']||'', d['E-mail']||'',
+                   d['Usluga']||'', d['Zeljeni datum']||'', d['Zeljeno vrijeme']||'',
+                   d['Napomena']||'', d['Poslano']||'', d['Stranica']||'']);
+  return ContentService.createTextOutput('OK');
+}
+```
+
+3. **Deploy → New deployment → Web app**
+   - *Execute as:* **Me**
+   - *Who has access:* **Anyone**
+   - Klikni **Deploy** i kopiraj **Web app URL** (izgleda kao `https://script.google.com/macros/s/AKfy.../exec`)
+4. U `index.html` nađi liniju (u `<script>` na dnu):
+   ```javascript
+   const SHEETS_WEBHOOK='';   // opcionalno: Google Sheets baza
+   ```
+   i zalijepi svoj URL između navodnika:
+   ```javascript
+   const SHEETS_WEBHOOK='https://script.google.com/macros/s/AKfy.../exec';
+   ```
+5. Sačuvaj i objavi — od sada se svaka rezervacija upisuje **i u e-mail i u tabelu**.
+
+---
+
+## 📱 Kontakt na stranici (trenutno stanje)
+
+- **Poziv:** `061 588 107` → `tel:+38761588107` (10 mjesta: navigacija, hero, kontakt, CTA, footer, mobilna traka)
+- **Viber:** `viber://chat?number=%2B38761588107` (7 mjesta — radi na telefonu gdje je Viber instaliran)
+- **Bez WhatsAppa i bez e-mail adrese na stranici** — kontakt ide isključivo pozivom i Viberom
